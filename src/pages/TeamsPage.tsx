@@ -285,8 +285,14 @@ const TeamsPage = () => {
         {/* Teams List */}
         <TeamsList 
           teams={filteredTeams}
-          onEditTeam={(team) => ('Edit team:', team)}
-          onDeleteTeam={(teamId) => ('Delete team:', teamId)}
+          onEditTeam={(team) => {
+            console.log("Edit team:", team);
+            // teamsService.updateTeam(team.id, team);
+          }}
+          onDeleteTeam={(teamId) => {
+            console.log("Delete team:", teamId);
+            teamsService.deleteTeam(teamId);
+          }}
         />
 
         {/* Add Team Modal */}

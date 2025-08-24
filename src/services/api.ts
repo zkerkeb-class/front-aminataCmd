@@ -1,5 +1,6 @@
 const BDD_BASE_URL = import.meta.env.VITE_BDD_SERVICE_URL;
 const PLANNING_BASE_URL = import.meta.env.VITE_PLANNING_SERVICE_URL;
+const TEAM_BASE_URL = import.meta.env.VITE_TEAM_SERVICE_URL;
 
 // Types pour les réponses API
 interface ApiResponse<T> {
@@ -123,7 +124,7 @@ export const usersService = {
 export const teamsService = {
   async getTeams() {
     try {
-      const response = await fetch(`${BDD_BASE_URL}/teams/`, {
+      const response = await fetch(`${TEAM_BASE_URL}`, {
         method: "GET",
         headers: {
           "accept": "application/json",
@@ -145,7 +146,7 @@ export const teamsService = {
 
   async getTeamsWithMembers() {
     try {
-      const response = await fetch(`${BDD_BASE_URL}/teams/with-members`, {
+      const response = await fetch(`${TEAM_BASE_URL}?limit=50`, {
         method: "GET",
         headers: {
           "accept": "application/json",
@@ -165,16 +166,16 @@ export const teamsService = {
     }
   },
 
-    async createTeam(tournament_id: string, teamData: any) {
-        try {
-            const response = await fetch(`${BDD_BASE_URL}/tournaments/${tournament_id}/teams/`, {
-                method: "POST",
-                headers: {
-                    "accept": "application/json",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(teamData)
-            });
+  async createTeam(tournament_id: string, teamData: any) {
+    try {
+      const response = await fetch(`${TEAM_BASE_URL}/tournament/${tournament_id}`, {
+          method: "POST",
+          headers: {
+              "accept": "application/json",
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(teamData)
+      });
 
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
@@ -190,14 +191,13 @@ export const teamsService = {
 
   async addPlayersToTeam(teamId: string, players: any[]) {
     try {
-      const response = await fetch(`${BDD_BASE_URL}/tournaments/teams/${teamId}/members`, {
+      const response = await fetch(`${TEAM_BASE_URL}/${teamId}/members`, {
         method: "POST",
         headers: {
           "accept": "application/json",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          team_id: teamId,
           players: players
         })
       });
@@ -210,6 +210,27 @@ export const teamsService = {
       return responseJson.data;
     } catch (error) {
       console.error("Erreur lors de l'ajout des joueurs à l'équipe:", error.message);
+      throw error;
+    }
+  },
+
+  async deleteTeam(teamId: string) {
+    try {
+      const response = await fetch(`${TEAM_BASE_URL}/${teamId}`, {
+        method: "DELETE",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json"
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const responseJson: ApiResponse<any> = await response.json();
+      return responseJson.data;
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'équipe:", error.message);
       throw error;
     }
   }
