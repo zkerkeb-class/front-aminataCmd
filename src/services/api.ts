@@ -1,6 +1,7 @@
 const BDD_BASE_URL = import.meta.env.VITE_BDD_SERVICE_URL;
 const PLANNING_BASE_URL = import.meta.env.VITE_PLANNING_SERVICE_URL;
 const TEAM_BASE_URL = import.meta.env.VITE_TEAM_SERVICE_URL;
+
 const TOURNAMENT_BASE_URL = import.meta.env.VITE_TOURNAMENT_SERVICE_URL;
 const AUTH_BASE_URL = import.meta.env.VITE_AUTH_SERVICE_URL_NEW;
 // Types pour les réponses API
@@ -36,12 +37,14 @@ export const tournamentService = {
 
   async createTournament(tournamentData: any) {
     try {
+      console.log("tournamentData", tournamentData);
       const response = await fetch(`${TOURNAMENT_BASE_URL}/organizer`, 
         {
           method: "POST",
           headers: {
             "accept": "application/json", 
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('access_token')}`
           },
           body: JSON.stringify(tournamentData),
           credentials: 'include' // Pour envoyer les cookies d'authentification
@@ -56,6 +59,50 @@ export const tournamentService = {
       return responseJson.data;
     } catch (error) {
       console.error("Erreur lors de la création du tournoi:", error.message);
+      throw error;
+    }
+  },
+
+  async getTournamentById(id: string) {
+    try {
+      const response = await fetch(`${TOURNAMENT_BASE_URL}/${id}`, {
+        method: "GET",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const responseJson: ApiResponse<any> = await response.json();
+      return responseJson;
+    } catch (error) {
+      console.error("Erreur lors de la récupération du tournoi:", error.message);
+      throw error;
+    }
+  },
+
+  async getTeamsByTournament(tournamentId: string) {
+    try {
+      const response = await fetch(`${TOURNAMENT_BASE_URL}/${tournamentId}/teams`, {
+        method: "GET",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const responseJson: ApiResponse<any> = await response.json();
+      return responseJson;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des équipes:", error.message);
       throw error;
     }
   }

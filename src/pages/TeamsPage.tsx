@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import TeamsList from '@/components/teams/TeamsList';
 import TeamForm from '@/components/teams/TeamForm';
 import { Team, TournamentDetail } from '@/types/planning';
-import { teamsService, tournamentsService, usersService } from '@/services/api';
+import { teamsService, tournamentService, usersService } from '@/services/api';
 
 const TeamsPage = () => {
   const [isAddingTeam, setIsAddingTeam] = useState(false);
@@ -24,8 +24,8 @@ const TeamsPage = () => {
   const handleGetTournaments = async () => {
     setIsLoadingTournaments(true);
     try {
-      const data = await tournamentsService.getTournaments();
-      setTournaments(data);
+      const data = await tournamentService.getTournaments();
+      setTournaments(data["tournaments"]);
     } catch (error) {
       console.error("Erreur lors du chargement des tournois:", error.message);
     } finally {

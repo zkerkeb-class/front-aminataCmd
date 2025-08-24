@@ -60,7 +60,7 @@ const TournamentCard = ({ tournament, onStatusChange }: TournamentCardProps) => 
         <div className="flex items-center text-sm text-gray-600">
           <Calendar className="w-4 h-4 mr-2" />
           <span>
-            {new Date(tournament.start_date).toLocaleDateString('fr-FR')} à {tournament.start_time}
+            {new Date(tournament.start_date).toLocaleDateString('fr-FR')} à {new Date(tournament.start_time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
         

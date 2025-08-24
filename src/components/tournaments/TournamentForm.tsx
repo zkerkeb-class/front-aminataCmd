@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { tournamentService } from '@/services/api';
 
 interface TournamentFormData {
   name: string;
@@ -96,31 +97,7 @@ const TournamentForm = () => {
 
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) {
-        try {
-          (JSON.stringify(formData))
-          const response = await fetch(url, 
-            {
-              method: "POST",
-              headers: {
-                "accept": "application/json",
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify(formData)
-              
-            }
-          );
-          if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-          }
-          const json = await response.json();
-        } catch (error) {
-          console.error(error.message);
-        }
-      // toast({
-      //   title: "Champs requis",
-      //   description: "Veuillez remplir tous les champs obligatoires.",
-      //   variant: "destructive",
-      // });
+      tournamentService.createTournament(formData);
       return;
     }
 

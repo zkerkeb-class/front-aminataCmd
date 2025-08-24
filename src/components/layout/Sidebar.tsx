@@ -5,7 +5,7 @@ import { Home, Trophy, Users, Bot, Settings, Plus, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Tournois', href: '/tournaments', icon: Trophy },
   { name: 'Équipes', href: '/teams', icon: Users },
   { name: 'Planning IA', href: '/planning', icon: Bot },

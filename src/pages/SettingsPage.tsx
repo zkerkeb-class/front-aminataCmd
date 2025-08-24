@@ -25,7 +25,7 @@ const SettingsPage = () => {
           description: "Vous avez été déconnecté avec succès",
         });
       }
-      navigate('/auth');
+      navigate('/');
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
       toast({

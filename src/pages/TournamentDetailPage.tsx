@@ -11,6 +11,7 @@ import CalendarView from '@/components/planning/CalendarView';
 import TableView from '@/components/planning/TableView';
 import { TournamentDetail } from '@/pages/TournamentsPage';
 import { Match, AIPlanning, Team } from '@/types/planning';
+import { tournamentService } from '@/services/api';
 
 
 const TournamentDetailPage = () => {
@@ -112,7 +113,7 @@ const TournamentDetailPage = () => {
           "Content-Type": "application/json"
         }
       });
-      
+
       if (response.ok) {
         const planningData = await response.json();
         if (planningData && planningData.data && planningData.data.planning_data) {
@@ -141,18 +142,8 @@ const TournamentDetailPage = () => {
 
   const fetchTournament = async () => {
     try {
-      const response = await fetch(`${bddUrl}/tournaments/${id}`, {
-        method: 'GET',
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setTournament(data.data[0]);
-      }
+      const response = await tournamentService.getTournamentById(id);
+      setTournament(response["data"]);
     } catch (error) {
       console.error('Error fetching tournament:', error);
     } finally {
@@ -162,20 +153,9 @@ const TournamentDetailPage = () => {
 
   const fetchTeams = async (tournamentId: string) => {
     try {
-      const response = await fetch(`${bddUrl}/teams/with-members?tournament_id=${tournamentId}`, {
-        method: 'GET',
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          // Filtrer les équipes pour ce tournoi spécifique si nécessaire
-          setTeams(data.data);
-        }
+      const response = await tournamentService.getTeamsByTournament(tournamentId);
+      if (response["success"]) {
+        setTeams(response["data"]);
       }
     } catch (error) {
       console.error('Error fetching teams:', error);

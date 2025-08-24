@@ -6,7 +6,7 @@ import TournamentCard from '@/components/tournaments/TournamentCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
+import { tournamentService } from '@/services/api';
 
 export interface TournamentDetail {
     id: string, 
@@ -56,15 +56,18 @@ const TournamentsPage = () => {
 
   const getTournaments = async () => {
     try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "accept": "application/json",
-          "Content-Type": "application/json"
-        }
-      });
-      const responseJson = await response.json()
-      setTournaments(responseJson["data"])
+      const response = await tournamentService.getTournaments();
+      console.log("response", response["tournaments"]);
+      setTournaments(response["tournaments"]);
+      // const response = await fetch(url, {
+      //   method: "GET",
+      //   headers: {
+      //     "accept": "application/json",
+      //     "Content-Type": "application/json"
+      //   }
+      // });
+      // const responseJson = await response.json()
+      // setTournaments(responseJson["data"])
     } catch (error) {
         console.error(error.message);
     }
