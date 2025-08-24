@@ -1,7 +1,8 @@
 const BDD_BASE_URL = import.meta.env.VITE_BDD_SERVICE_URL;
 const PLANNING_BASE_URL = import.meta.env.VITE_PLANNING_SERVICE_URL;
 const TEAM_BASE_URL = import.meta.env.VITE_TEAM_SERVICE_URL;
-
+const TOURNAMENT_BASE_URL = import.meta.env.VITE_TOURNAMENT_SERVICE_URL;
+const AUTH_BASE_URL = import.meta.env.VITE_AUTH_SERVICE_URL_NEW;
 // Types pour les réponses API
 interface ApiResponse<T> {
     success: boolean;
@@ -10,10 +11,10 @@ interface ApiResponse<T> {
 }
 
 // Service pour les tournois
-export const tournamentsService = {
+export const tournamentService = {
   async getTournaments() {
     try {
-      const response = await fetch(`${BDD_BASE_URL}/tournaments/`, {
+      const response = await fetch(`${TOURNAMENT_BASE_URL}`, {
         method: "GET",
         headers: {
           "accept": "application/json",
@@ -29,6 +30,32 @@ export const tournamentsService = {
       return responseJson.data;
     } catch (error) {
       console.error("Erreur lors de la récupération des tournois:", error.message);
+      throw error;
+    }
+  },
+
+  async createTournament(tournamentData: any) {
+    try {
+      const response = await fetch(`${TOURNAMENT_BASE_URL}/organizer`, 
+        {
+          method: "POST",
+          headers: {
+            "accept": "application/json", 
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(tournamentData),
+          credentials: 'include' // Pour envoyer les cookies d'authentification
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      const responseJson: ApiResponse<any[]> = await response.json();
+      return responseJson.data;
+    } catch (error) {
+      console.error("Erreur lors de la création du tournoi:", error.message);
       throw error;
     }
   }
@@ -235,3 +262,102 @@ export const teamsService = {
     }
   }
 }; 
+
+
+// service pour authentification 
+export const authService = {
+  async register(email: string, password: string, userRole: string) {
+    try {
+      const response = await fetch(`${AUTH_BASE_URL}/register`, {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password, role: userRole })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const responseJson: ApiResponse<any> = await response.json();
+      return responseJson.data;
+    } catch (error) {
+      console.error("Erreur lors de l'inscription:", error.message);
+      throw error;
+    }
+  },
+
+  async login(email: string, password: string) {
+    try {
+      const response = await fetch(`${AUTH_BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const responseJson: ApiResponse<any> = await response.json();
+      localStorage.setItem('access_token', responseJson.data.user.access_token);
+      return responseJson.data;
+    } catch (error) {
+      console.error("Erreur lors de la connexion:", error.message);
+      throw error;
+    }
+  },
+
+  async getUser() {
+    try {
+      const response = await fetch(`${AUTH_BASE_URL}/user`, {
+        method: "GET",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const responseJson: ApiResponse<any> = await response.json();
+      return responseJson.data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'utilisateur:", error.message);
+      throw error;
+    }
+  },
+
+  async logout() {
+    try {
+      const response = await fetch(`${AUTH_BASE_URL}/logout`, {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const responseJson: ApiResponse<any> = await response.json();
+      localStorage.removeItem('access_token');
+      return responseJson;
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error.message);
+      throw error;
+    }
+  }
+  
+};

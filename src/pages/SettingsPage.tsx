@@ -10,23 +10,21 @@ import { Badge } from '@/components/ui/badge';
 import { Settings, User, Bell, Shield, Palette, Database, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { authService } from '@/services/api';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
-      // Supprimer le token d'authentification
-      localStorage.removeItem('authToken');
-      
-      // Afficher une notification de succès
-      toast({
-        title: "Déconnexion réussie",
-        description: "Vous avez été déconnecté avec succès",
-      });
-      
-      // Rediriger vers la page d'authentification
+      const response = await authService.logout();
+      if (response) {
+        toast({
+          title: "Déconnexion réussie",
+          description: "Vous avez été déconnecté avec succès",
+        });
+      }
       navigate('/auth');
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);

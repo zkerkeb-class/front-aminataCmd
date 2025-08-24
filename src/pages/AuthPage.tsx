@@ -8,12 +8,14 @@ import { Separator } from '@/components/ui/separator';
 import { Github, Loader2 } from 'lucide-react';
 import GoogleIcon from '@/components/auth/GoogleIcon';
 import { useToast } from '@/hooks/use-toast';
+import { authService } from '@/services/api';
 
 const AuthPage = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [userRole, setUserRole] = useState('joueur');
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
@@ -58,59 +60,27 @@ const AuthPage = () => {
     try {
       if (isSignIn) {
         // Connexion
-        const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/token`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'accept': 'application/json'
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password
-          })
-        });
-
-        const data = await response.json();
-
-        if (data) {
+        const response = await authService.login(email, password);
+        console.log("connexion", response);
+        if (response) {
           toast({
             title: "Connexion réussie",
             description: "Vous êtes maintenant connecté",
           });
-          
-          // Stocker le token si fourni
-          if (data.token) {
-            localStorage.setItem('authToken', data.token);
-          }
-          
           // Redirection vers le dashboard
-          navigate('/');
+          navigate('/dashboard');
         } else {
           toast({
             title: "Erreur de connexion",
-            description: data.message || "Email ou mot de passe incorrect",
+            description: response.message || "Email ou mot de passe incorrect",
             variant: "destructive"
           });
         }
       } else {
         // Inscription
-        const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/register`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'accept': 'application/json'
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password
-          })
-        });
-
-        const data = await response.json();
-
-        if (data) {
+        const response = await authService.register(email, password, userRole);
+        console.log("inscription", response);
+        if (response) {
           toast({
             title: "Inscription réussie",
             description: "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
@@ -124,7 +94,7 @@ const AuthPage = () => {
         } else {
           toast({
             title: "Erreur d'inscription",
-            description: data.message || "Une erreur est survenue lors de l'inscription",
+            description: response.message || "Une erreur est survenue lors de l'inscription",
             variant: "destructive"
           });
         }
@@ -239,6 +209,22 @@ const AuthPage = () => {
                     disabled={isLoading}
                     required 
                   />
+                  <Label htmlFor="userRole">Rôle</Label>
+                  <select
+                    id="userRole"
+                    value={userRole}
+                    onChange={(e) => {
+                      setUserRole(e.target.value);
+                      console.log(userRole);
+                    }}
+                    disabled={isLoading}
+                    required
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="joueur">Joueur</option>
+                    <option value="organisateur">Organisateur</option>
+                    <option value="spectateur">Spectateur</option>
+                  </select>
                 </div>
               )}
 
