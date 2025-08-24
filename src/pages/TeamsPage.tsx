@@ -6,6 +6,14 @@ import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
 import TeamsList from '@/components/teams/TeamsList';
 import TeamForm from '@/components/teams/TeamForm';
 import { Team, TournamentDetail } from '@/types/planning';
@@ -20,6 +28,8 @@ const TeamsPage = () => {
   const [isLoadingTeams, setIsLoadingTeams] = useState(false);
   const [isLoadingTournaments, setIsLoadingTournaments] = useState(false);
   const [isCreatingTeam, setIsCreatingTeam] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // 10 équipes par page
 
   const handleGetTournaments = async () => {
     setIsLoadingTournaments(true);
@@ -63,6 +73,18 @@ const TeamsPage = () => {
     
     return matchesSearch && matchesTournament;
   }) : [];
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredTeams.length / itemsPerPage);
+  const paginatedTeams = filteredTeams.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedTournament]);
 
   const handleAddTeam = async (teamData: any) => {
     setIsCreatingTeam(true);
@@ -284,7 +306,7 @@ const TeamsPage = () => {
 
         {/* Teams List */}
         <TeamsList 
-          teams={filteredTeams}
+          teams={paginatedTeams}
           onEditTeam={(team) => {
             console.log("Edit team:", team);
             // teamsService.updateTeam(team.id, team);
@@ -294,6 +316,41 @@ const TeamsPage = () => {
             teamsService.deleteTeam(teamId);
           }}
         />
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <PaginationItem key={page}>
+                    <PaginationLink 
+                      isActive={page === currentPage}
+                      onClick={() => setCurrentPage(page)}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
 
         {/* Add Team Modal */}
         {isAddingTeam && (

@@ -100,6 +100,14 @@ const Sidebar = () => {
           <div 
             className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 md:hidden"
             onClick={() => setIsOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setIsOpen(false);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Fermer le menu"
           />
           <div className="fixed inset-y-0 left-0 z-50 w-64 md:hidden">
             <SidebarContent />

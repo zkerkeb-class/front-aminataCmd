@@ -249,18 +249,18 @@ const LandingPage = () => {
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Centre d'aide</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
-                <li><a href="#" className="hover:text-white">Documentation</a></li>
+                <li><button className="hover:text-white text-left w-full">Centre d'aide</button></li>
+                <li><button className="hover:text-white text-left w-full">Contact</button></li>
+                <li><button className="hover:text-white text-left w-full">Documentation</button></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-semibold mb-4">Entreprise</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">À propos</a></li>
+                <li><button className="hover:text-white text-left w-full">À propos</button></li>
                 <li><Link to="/pricing" className="hover:text-white">Tarifs</Link></li>
-                <li><a href="#" className="hover:text-white">Confidentialité</a></li>
+                <li><button className="hover:text-white text-left w-full">Confidentialité</button></li>
               </ul>
             </div>
           </div>
